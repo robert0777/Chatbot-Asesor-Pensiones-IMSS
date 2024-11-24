@@ -1,0 +1,10 @@
+SEMINAR:
+https://event.on24.com/eventRegistration/console/apollox/mainEvent?&eventid=4677558&sessionid=1&username=&partnerref=&format=fhvideo1&mobile=&flashsupportedmobiledevice=&helpcenter=&key=9C6BCA70E53DF55BCC7B6A4F4DA402ED&newConsole=true&nxChe=true&newTabCon=true&consoleEarEventConsole=false&consoleEarCloudApi=false&text_language_id=en&playerwidth=748&playerheight=526&eventuserid=709876495&contenttype=A&mediametricsessionid=609671375&mediametricid=6585802&usercd=709876495&mode=launch
+
+
+https://console.brev.dev/launchable/deploy?userID=p2mzt91a8&orgID=toxbnhrwu&launchableID=env-2kG3qE4PjSuYkZ5Ay4aS9L1tAox&instance=A100@a2-highgpu-1g:nvidia-tesla-a100:1&diskStorage=500&cloudID=GCP&python=3.10&cuda=12.0.1&file=https://github.com/brevdev/notebooks/blob/main/nemo-reranker.ipynb&name=nemo-reranker
+
+
+https://github.com/nvidia/GenerativeAIExamples
+
+https://github.com/brevdev/notebooks/blob/main/nemo-reranker.ipynb
