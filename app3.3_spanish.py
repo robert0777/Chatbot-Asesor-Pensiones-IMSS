@@ -209,9 +209,10 @@ def normalize_spanish_text(text):
     return text.strip()
 
 # UI Setup remains unchanged
-st.set_page_config(layout="wide", page_title="Consulta Seguridad Social", page_icon="📄")
-st.image("LOGOTIPO_ACTUARIA_FINANZAS-03.png", width=600)
-st.title("Sistema de Consulta de Documentos de Seguridad Social Mexicana")
+st.set_page_config(layout="wide", page_title="Consulta Seguridad Social", page_icon="❓")
+st.image("LOGOTIPO_ACTUARIA_FINANZAS-03.png", width=500)
+st.header("Sistema de Consulta de Documentos de Seguridad Social Mexicana")
+# st.title("Sistema de Consulta de Documentos de Seguridad Social Mexicana")
 st.markdown("Este sistema analiza todos los documentos PDF en el directorio para proporcionar respuestas completas basadas en múltiples fuentes.")
 
 # Sidebar remains unchanged
