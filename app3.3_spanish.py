@@ -269,13 +269,28 @@ prompt1 = st.text_input(
     placeholder="Su pregunta será analizada en todos los documentos disponibles"
 )
 
+# if st.button("Cargar y Procesar Documentos"):
+#    with st.spinner('Cargando y procesando todos los documentos PDF...'):
+#        try:
+#            load_documents()
+#            st.success("📚 Todos los documentos han sido cargados correctamente. ¡Ahora puede hacer sus preguntas!")
+#        except Exception as e:
+#            st.error(f"Error al cargar los documentos: {str(e)}")
+
+
 if st.button("Cargar y Procesar Documentos"):
     with st.spinner('Cargando y procesando todos los documentos PDF...'):
         try:
+            start_time = time.process_time()
             load_documents()
-            st.success("📚 Todos los documentos han sido cargados correctamente. ¡Ahora puede hacer sus preguntas!")
+            processing_time = time.process_time() - start_time
+            st.success(f"📚 Todos los documentos han sido cargados correctamente en {processing_time:.2f} segundos. ¡Ahora puede hacer sus preguntas!")
         except Exception as e:
             st.error(f"Error al cargar los documentos: {str(e)}")
+
+
+
+
 
 # Enhanced Query Processing with Greeting Handler
 if prompt1:
