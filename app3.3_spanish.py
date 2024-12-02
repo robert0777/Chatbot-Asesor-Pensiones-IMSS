@@ -210,14 +210,14 @@ def normalize_spanish_text(text):
 
 # UI Setup remains unchanged
 st.set_page_config(layout="wide", page_title="Consulta Seguridad Social", page_icon="❓")
-st.image("LOGOTIPO_ACTUARIA_FINANZAS-03.png", width=500)
+st.image("ai-advisor-icon.svg", width=100)
 st.header("Sistema de Consulta de Documentos de Seguridad Social Mexicana")
 # st.title("Sistema de Consulta de Documentos de Seguridad Social Mexicana")
 st.markdown("Este sistema analiza todos los documentos PDF en el directorio para proporcionar respuestas completas basadas en múltiples fuentes.")
 
 # Sidebar remains unchanged
 with st.sidebar:
-    st.image("LOGOTIPO_ACTUARIA_FINANZAS-03.png", width=300)
+    st.image("ai-advisor-icon.svg", width=50)
     st.markdown("## 📖 About This App")
     st.write("Analyze and query Mexican social security documents.")
     st.markdown("""
