@@ -12,6 +12,9 @@ from functools import lru_cache
 import re
 import datetime
 
+
+
+
 # Load environment variables
 load_dotenv()
 
@@ -215,19 +218,117 @@ st.header("Sistema de Consulta de Documentos de Seguridad Social Mexicana")
 # st.title("Sistema de Consulta de Documentos de Seguridad Social Mexicana")
 st.markdown("Este sistema analiza todos los documentos PDF en el directorio para proporcionar respuestas completas basadas en múltiples fuentes.")
 
+
+
 # Sidebar remains unchanged
+# with st.sidebar:
+#    st.image("ai-advisor-icon.svg", width=50)
+#    st.markdown("## 📖 About This App")
+#    st.write("Analyze and query Mexican social security documents.")
+#    st.markdown("""
+#    ---
+#    **Author**: [Dr. Robert Hernández Martínez](https://www.credly.com/users/robert-hernandez.89bffe7b)  
+#    📧 [Contact](mailto:robert@actuariayfinanzas.net)  
+#    🌐 [Articles 01](https://chomchom216.medium.com/)
+#    🌐 [Articles 02](https://unam1.academia.edu/Robert_Hernandez_Martinez)
+#    ---
+#    """)
+
+
+
+
+
+
+
+
+# Create custom CSS for the sidebar
+st.markdown("""
+<style>
+    .sidebar .sidebar-content {
+        background-color: white;
+    }
+    
+    .sidebar-app-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #1F2937;
+    }
+    
+    .sidebar-section {
+        padding: 1rem 0;
+        border-bottom: 1px solid #E5E7EB;
+    }
+    
+    .sidebar-link {
+        display: flex;
+        align-items: center;
+        color: #4B5563;
+        text-decoration: none;
+        padding: 0.5rem 0;
+        transition: color 0.2s;
+    }
+    
+    .sidebar-link:hover {
+        color: #2563EB;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Sidebar content
 with st.sidebar:
-    st.image("ai-advisor-icon.svg", width=50)
-    st.markdown("## 📖 About This App")
-    st.write("Analyze and query Mexican social security documents.")
+    # App Logo and Title
+    col1, col2 = st.columns([1, 3])
+    with col1:
+        st.image("ai-advisor-icon.svg", width=50)
+    with col2:
+        st.markdown('<p class="sidebar-app-name">AI Chatbot Asesor de Pensiones IMSS</p>', unsafe_allow_html=True)
+    
+    # About Section
+    st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
+    st.markdown("### 📖 About this App")
+    st.write("A powerful tool to analyze and query Mexican social security documents using advanced AI technology.")
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Author Section
+    st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
+    # st.markdown("### 👨‍🏫 Author")
+    # st.markdown("### 📝 Author")
+    st.markdown("### 👤 Author")
+    st.markdown("**Dr. Robert Hernández Martínez**")
+    
+    # Contact Links
     st.markdown("""
-    ---
-    **Author**: [Dr. Robert Hernández Martínez](https://www.credly.com/users/robert-hernandez.89bffe7b)  
-    📧 [Contact](mailto:robert@actuariayfinanzas.net)  
-    🌐 [Articles 01](https://chomchom216.medium.com/)
-    🌐 [Articles 02](https://unam1.academia.edu/Robert_Hernandez_Martinez)
-    ---
-    """)
+        <a href="https://chomchom216.medium.com/" class="sidebar-link">
+            📝 Articles on Medium
+        </a>
+        <a href="https://unam1.academia.edu/Robert_Hernandez_Martinez" class="sidebar-link">
+            🎓 Academic Publications
+        </a>
+        <a href="https://www.credly.com/users/robert-hernandez.89bffe7b" class="sidebar-link">
+            🏆 Credentials
+        </a>
+        <a href="mailto:robert@actuariayfinanzas.net" class="sidebar-link">
+            📧 Contact
+        </a>
+    """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Footer
+    st.markdown("""
+        <div style="position: fixed; bottom: 0; padding: 1rem; text-align: center; font-size: 0.8rem; color: #6B7280;">
+            © 2024 AI Chatbot Asesor de Pensiones IMSS
+        </div>
+    """, unsafe_allow_html=True)
+
+
+
+
+
+
+
+
+
 
 # Initialize NVIDIA AI
 base_url = "https://integrate.api.nvidia.com/v1"
