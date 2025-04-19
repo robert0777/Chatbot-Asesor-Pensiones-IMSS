@@ -214,8 +214,8 @@ def normalize_spanish_text(text):
 # UI Setup remains unchanged
 st.set_page_config(layout="wide", page_title="Consulta Seguridad Social", page_icon="❓")
 st.image("ai-advisor-icon.svg", width=100)
-st.header("Sistema de Consulta de Documentos de Seguridad Social Mexicana")
-# st.title("Sistema de Consulta de Documentos de Seguridad Social Mexicana")
+st.header("Sistema de Consulta de Documentos de Seguridad Social Mexicana -IMSS")
+# st.title("Sistema de Consulta de Documentos de Seguridad Social Mexicana - IMSS")
 st.markdown("Este sistema analiza todos los documentos PDF en el directorio para proporcionar respuestas completas basadas en múltiples fuentes.")
 
 
@@ -463,6 +463,6 @@ div.custom-footer {
 }
 </style>
 <div class="custom-footer">
-    Developed by Dr. Robert Hernández Martínez    |    robert@actuariayfinanzas.net    |    © 2024
+    Developed by Dr. Robert Hernández Martínez    |    robert@actuariayfinanzas.net    |    © 2025
 </div>
 """, unsafe_allow_html=True)
