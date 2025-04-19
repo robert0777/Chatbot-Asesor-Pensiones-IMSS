@@ -212,9 +212,9 @@ def normalize_spanish_text(text):
     return text.strip()
 
 # UI Setup remains unchanged
-st.set_page_config(layout="wide", page_title="Consulta Seguridad Social", page_icon="❓")
+st.set_page_config(layout="wide", page_title="AI Chatbot Asesor de Pensiones IMSS", page_icon="❓")
 st.image("ai-advisor-icon.svg", width=100)
-st.header("Sistema de Consulta de Documentos de Seguridad Social Mexicana -IMSS")
+st.header("Sistema de Consulta de Documentos de Seguridad Social Mexicana - IMSS")
 # st.title("Sistema de Consulta de Documentos de Seguridad Social Mexicana - IMSS")
 st.markdown("Este sistema analiza todos los documentos PDF en el directorio para proporcionar respuestas completas basadas en múltiples fuentes.")
 
