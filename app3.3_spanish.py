@@ -13,7 +13,7 @@ from functools import lru_cache
 import re
 import datetime
 
-# Set page configuration
+# IMPORTANT: set_page_config must be the first Streamlit command
 st.set_page_config(
     page_title="Asistente de Seguridad Social",
     page_icon="🏥",
@@ -21,7 +21,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for better UI
+# Custom CSS for better UI (after set_page_config)
 st.markdown('''
 <style>
     /* Main container styling */
@@ -306,7 +306,7 @@ def normalize_spanish_text(text):
 st.set_page_config(layout="wide", page_title="Consulta Seguridad Social", page_icon="❓")
 st.image("ai-advisor-icon.svg", width=100)
 st.header("Sistema de Consulta de Documentos de Seguridad Social Mexicana - IMSS")
-# st.title("Sistema de Consulta de Documentos de Seguridad Social Mexicana - IMSS")
+# st.title("Sistema de Consulta de Documentos de Seguridad Social Mexicana- IMSS")
 st.markdown("Este sistema analiza todos los documentos PDF en el directorio para proporcionar respuestas completas basadas en múltiples fuentes.")
 
 
@@ -563,7 +563,7 @@ st.markdown('''
             </a>
         </div>
         <div style="color: #6c757d;">
-            Developed by Dr. Robert Hernández Martínez © 2024
+            Developed by Dr. Robert Hernández Martínez © 2025
         </div>
     </div>
 ''', unsafe_allow_html=True)
