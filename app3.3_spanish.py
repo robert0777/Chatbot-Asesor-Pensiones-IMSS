@@ -376,7 +376,7 @@ prompt1 = st.text_input(
     placeholder="Su pregunta será analizada en todos los documentos disponibles"
 )
 
-if st.button("Click aquí para Cargar y Procesar Documentos"):
+if st.button("Click aquí para Cargar y Procesar Documentos en el Sistema"):
     with st.spinner('Cargando y procesando todos los documentos PDF...'):
         try:
             start_time = time.process_time()
