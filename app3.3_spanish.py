@@ -2,8 +2,8 @@ import streamlit as st
 import os
 from openai import OpenAI  # Changed from langchain_nvidia_ai_endpoints
 from langchain_community.document_loaders import PyPDFDirectoryLoader
-# from langchain_community.text_splitter import RecursiveCharacterTextSplitter  # Fixed import
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter  # Fixed import
+
 from langchain_core.prompts import ChatPromptTemplate
 import time
 from dotenv import load_dotenv
