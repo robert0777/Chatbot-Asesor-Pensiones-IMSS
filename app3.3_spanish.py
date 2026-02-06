@@ -294,7 +294,12 @@ with st.sidebar:
         </a>
         <a href="https://www.credly.com/users/robert-hernandez.89bffe7b" class="sidebar-link">
             🏆 Credentials
+
         </a>
+        <a href="https://github.com/robert0777" class="sidebar-link">
+        🐙 GitHub
+        </a>
+        
         <a href="mailto:robert@actuariayfinanzas.net" class="sidebar-link">
             📧 Contact
         </a>
