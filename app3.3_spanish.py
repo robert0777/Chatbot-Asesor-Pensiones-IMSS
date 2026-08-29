@@ -13,7 +13,7 @@ from functools import lru_cache
 import re
 import datetime
 
-from langchain_nvidia_ai_endpoints import ChatNVIDIA  # Replace the OpenAI import
+
 
 
 # Load environment variables
@@ -317,10 +317,6 @@ with st.sidebar:
 
 
 
-
-
-
-
 # OpenRouter client initialization
 try:
     openrouter_client = OpenAI(
@@ -328,8 +324,8 @@ try:
         api_key=os.getenv("OPENROUTER_API_KEY")
     )
     
-    # Target free OpenRouter model
-    MODEL_NAME = "meta-llama/llama-3.3-70b-instruct:free"
+    # Active free target model
+    MODEL_NAME = "meta-llama/llama-3.1-405b-instruct:free"
     
     # Simple test connection
     test_response = openrouter_client.chat.completions.create(
@@ -341,6 +337,8 @@ try:
         max_tokens=20,
         stream=False
     )
+
+
 except Exception as e:
     st.error(f"""Error al inicializar el cliente de OpenRouter: {str(e)}
              Acciones requeridas:
