@@ -317,6 +317,8 @@ with st.sidebar:
 
 
 
+
+
 # OpenRouter client initialization
 try:
     openrouter_client = OpenAI(
@@ -324,8 +326,8 @@ try:
         api_key=os.getenv("OPENROUTER_API_KEY")
     )
     
-    # Active free target model
-    MODEL_NAME = "meta-llama/llama-3.1-405b-instruct:free"
+    # Target OpenRouter auto-router for free endpoints
+    MODEL_NAME = "openrouter/auto"
     
     # Simple test connection
     test_response = openrouter_client.chat.completions.create(
@@ -337,8 +339,6 @@ try:
         max_tokens=20,
         stream=False
     )
-
-
 except Exception as e:
     st.error(f"""Error al inicializar el cliente de OpenRouter: {str(e)}
              Acciones requeridas:
