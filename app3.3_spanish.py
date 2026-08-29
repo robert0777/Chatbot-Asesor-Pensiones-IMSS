@@ -160,7 +160,7 @@ def load_documents():
         
         st.session_state.documents = text_splitter.split_documents(processed_docs)
 
-def select_relevant_chunks(question, chunks, max_total_tokens=6000):
+def select_relevant_chunks(question, chunks, max_total_tokens=3500):
     prompt_tokens = count_tokens(question) + 500
     available_tokens = max_total_tokens - prompt_tokens
     
@@ -318,30 +318,34 @@ with st.sidebar:
 
 
 
-# NVIDIA client initialization
+
+
+
+# OpenRouter client initialization
 try:
-    nvidia_client = OpenAI(
-        base_url="https://integrate.api.nvidia.com/v1",
-        api_key=os.getenv("NVIDIA_API_KEY")
+    openrouter_client = OpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key=os.getenv("OPENROUTER_API_KEY")
     )
     
-    # Test connection with active target model
-    test_response = nvidia_client.chat.completions.create(
-        model="meta/muse-glimmer-30b",
+    # Target free OpenRouter model
+    MODEL_NAME = "meta-llama/llama-3.3-70b-instruct:free"
+    
+    # Simple test connection
+    test_response = openrouter_client.chat.completions.create(
+        model=MODEL_NAME,
         messages=[
             {"role": "system", "content": "Eres un asistente experto en seguridad social."},
             {"role": "user", "content": "test connection"}
         ],
-        temperature=0.6,
-        max_tokens=100,
+        max_tokens=20,
         stream=False
     )
 except Exception as e:
-    st.error(f"""Error al inicializar el cliente: {str(e)}
+    st.error(f"""Error al inicializar el cliente de OpenRouter: {str(e)}
              Acciones requeridas:
-             1. Verifique la clave de API en el archivo .env
-             2. Verifique el acceso al modelo en el panel de control
-             3. Asegúrese de que la cuenta tenga los permisos correspondientes""")
+             1. Verifique la clave OPENROUTER_API_KEY en el archivo .env
+             2. Verifique su conexión a internet""")
     st.stop()
 
 
@@ -438,11 +442,9 @@ if prompt1:
                     
                     
                     
-                    
-
-                    # Updated for meta/muse-glimmer-30b
-                    completion = nvidia_client.chat.completions.create(
-                        model="meta/muse-glimmer-30b",
+                    # Generate response via OpenRouter with streaming
+                    response_stream = openrouter_client.chat.completions.create(
+                        model=MODEL_NAME,
                         messages=[
                             {
                                 "role": "system", 
@@ -456,23 +458,18 @@ if prompt1:
                                 )
                             }
                         ],
-                        temperature=0.6,
-                        top_p=0.95,
-                        max_tokens=4000,
-                        frequency_penalty=0,
-                        presence_penalty=0,
-                        stream=False
+                        temperature=0.4,
+                        top_p=0.9,
+                        max_tokens=1500,
+                        stream=True,
+                        extra_headers={
+                            "HTTP-Referer": "http://localhost:8501",
+                            "X-Title": "IMSS Pension Advisor"
+                        }
                     )
                     
-                    
-                    
-                    
-                    
-                    
-                    
-                    
                     st.write("📝 Respuesta:")
-                    st.write(completion.choices[0].message.content)
+                    st.write_stream(response_stream)
                     
                     st.info(f"⏱️ Tiempo de procesamiento: {time.process_time() - start:.2f} segundos")
                     
@@ -488,9 +485,8 @@ if prompt1:
                 st.error(f"""Error durante el procesamiento: {str(e)}
                          Posibles soluciones:
                          1. Verifique su conexión a internet
-                         2. Confirme el acceso al modelo en NGC
-                         3. Pruebe con una consulta más corta""")
-                
+                         2. Confirme la validez de su clave OPENROUTER_API_KEY en el archivo .env
+                         3. Pruebe con una consulta más corta o vuelva a intentar si el modelo gratuito está saturado""")
         else:
             st.warning("⚠️ Por favor, primero cargue los documentos usando el botón 'Cargar y Procesar Documentos'")
     elif not is_greeting:
