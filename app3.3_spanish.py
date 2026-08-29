@@ -316,19 +316,20 @@ with st.sidebar:
 
 
 
-# Replace your NVIDIA client initialization with this:
 
+
+# NVIDIA client initialization
 try:
     nvidia_client = OpenAI(
         base_url="https://integrate.api.nvidia.com/v1",
         api_key=os.getenv("NVIDIA_API_KEY")
     )
     
-    # Test connection with simpler parameters
+    # Test connection with active target model
     test_response = nvidia_client.chat.completions.create(
-        model="nvidia/llama-3.3-nemotron-super-49b-v1.5",
+        model="meta/muse-glimmer-30b",
         messages=[
-            {"role": "system", "content": "/think"},
+            {"role": "system", "content": "Eres un asistente experto en seguridad social."},
             {"role": "user", "content": "test connection"}
         ],
         temperature=0.6,
@@ -336,12 +337,14 @@ try:
         stream=False
     )
 except Exception as e:
-    st.error(f"""Failed to initialize NVIDIA NIMS client: {str(e)}
-             Required actions:
-             1. Verify API key in .env file
-             2. Check model access at NGC dashboard
-             3. Ensure account has NIMS permissions""")
+    st.error(f"""Error al inicializar el cliente: {str(e)}
+             Acciones requeridas:
+             1. Verifique la clave de API en el archivo .env
+             2. Verifique el acceso al modelo en el panel de control
+             3. Asegúrese de que la cuenta tenga los permisos correspondientes""")
     st.stop()
+
+
 
 
 
@@ -429,11 +432,22 @@ if prompt1:
                     context = "\n\n".join(context_parts)
                     context = truncate_context(context)
                     
-                    # Updated for NVIDIA NIMS model
+                   
+                    
+                    
+                    
+                    
+                    
+                    
+
+                    # Updated for meta/muse-glimmer-30b
                     completion = nvidia_client.chat.completions.create(
-                        model="nvidia/llama-3.3-nemotron-super-49b-v1.5",
+                        model="meta/muse-glimmer-30b",
                         messages=[
-                            {"role": "system", "content": "/think"},  # Required system prompt
+                            {
+                                "role": "system", 
+                                "content": "Eres un experto asesor en materia de seguridad social e IMSS en México."
+                            },
                             {
                                 "role": "user",
                                 "content": prompt_template.format(
@@ -442,13 +456,20 @@ if prompt1:
                                 )
                             }
                         ],
-                        temperature=0.6,  # Optimal for Spanish Q&A
+                        temperature=0.6,
                         top_p=0.95,
-                        max_tokens=4000,  # Reduced from 65536 for practical usage
+                        max_tokens=4000,
                         frequency_penalty=0,
                         presence_penalty=0,
-                        stream=False  # Set to True if you want streaming
+                        stream=False
                     )
+                    
+                    
+                    
+                    
+                    
+                    
+                    
                     
                     st.write("📝 Respuesta:")
                     st.write(completion.choices[0].message.content)
