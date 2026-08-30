@@ -4,9 +4,9 @@
 
 A Streamlit-based web application designed to query, analyze, and synthesize official Mexican social security and IMSS (Instituto Mexicano del Seguro Social) pension documents using advanced Retrieval-Augmented Generation (RAG) architectures powered by OpenRouter and LangChain.
 
-🔗 **Live Application:** [AI Chatbot Asesor de Pensiones IMSS](https://chatbot-asesor-pensiones-imss.streamlit.app/) 
-🔗 **Read the article at Medium:** [Generative AI-Enabled Assistant for Pensions Chatbot Asesor de Pensiones del IMSS](https://medium.com/latinxinai/generative-ai-enabled-assistant-for-pensions-a24435db6b01?sharedUserId=chomchom216)
-🔗 **Read the article at Actuarios Trabajando - México:** [Generative AI-Enabled Assistant for Pensions](https://static1.squarespace.com/static/694987771d60827a9dbf41de/t/69c7c8fc5c0536077e0c6acf/1774700797001/Revista+Volumen+17.pdf)
+* 🔗 **Live Application:** [AI Chatbot Asesor de Pensiones IMSS](https://chatbot-asesor-pensiones-imss.streamlit.app/)
+* 🔗 **Read the article at Medium:** [Generative AI-Enabled Assistant for Pensions — Chatbot Asesor de Pensiones del IMSS](https://medium.com/latinxinai/generative-ai-enabled-assistant-for-pensions-a24435db6b01?sharedUserId=chomchom216)
+* 🔗 **Read the article at Actuarios Trabajando - México:** [Generative AI-Enabled Assistant for Pensions](https://static1.squarespace.com/static/694987771d60827a9dbf41de/t/69c7c8fc5c0536077e0c6acf/1774700797001/Revista+Volumen+17.pdf)
 
 ---
 
