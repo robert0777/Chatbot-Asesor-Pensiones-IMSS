@@ -319,32 +319,73 @@ with st.sidebar:
 
 
 
-# OpenRouter client initialization
+
+
+
+# OpenRouter Client Setup
+openrouter_key = os.getenv("OPENROUTER_API_KEY")
+
+if not openrouter_key:
+    st.error("⚠️ OPENROUTER_API_KEY no encontrada en las variables de entorno.")
+    st.stop()
+
 try:
     openrouter_client = OpenAI(
         base_url="https://openrouter.ai/api/v1",
-        api_key=os.getenv("OPENROUTER_API_KEY")
+        api_key=openrouter_key
     )
     
-    # Target OpenRouter auto-router for free endpoints
-    MODEL_NAME = "openrouter/auto"
     
-    # Simple test connection
-    test_response = openrouter_client.chat.completions.create(
-        model=MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "Eres un asistente experto en seguridad social."},
-            {"role": "user", "content": "test connection"}
-        ],
-        max_tokens=20,
-        stream=False
-    )
+    
+    
+    
+    # Active high-throughput free text generation models on OpenRouter
+    FREE_MODELS = [
+        "minimax/minimax-m3:free",                   # Fast, 1M context
+        "nvidia/nemotron-3-ultra-550b-a55b:free",    # Frontier reasoning, 1M context
+        "cohere/north-mini-code:free",                 # Low latency
+        "google/gemma-4-31b-it:free",                 # Multilingual instruction follower
+        "openrouter/free"                            # OpenRouter dynamic router fallback
+    ]
+    
+    
+      
 except Exception as e:
-    st.error(f"""Error al inicializar el cliente de OpenRouter: {str(e)}
-             Acciones requeridas:
-             1. Verifique la clave OPENROUTER_API_KEY en el archivo .env
-             2. Verifique su conexión a internet""")
+    st.error(f"Error al inicializar el cliente de OpenRouter: {str(e)}")
     st.stop()
+
+
+def generate_completion_with_fallback(client, models_list, messages, temperature=0.4, max_tokens=1500):
+    """
+    Attempts to stream chat completion using a list of models sequentially.
+    """
+    last_error = None
+    for model in models_list:
+        try:
+            response_stream = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                stream=True,
+                extra_headers={
+                    "HTTP-Referer": "http://localhost:8501",
+                    "X-Title": "IMSS Pension Advisor"
+                }
+            )
+            # Return successfully initialized stream and model used
+            return response_stream, model
+        except Exception as err:
+            last_error = err
+            continue # Try next model on failure
+            
+    raise RuntimeError(f"Todos los modelos fallaron. Último error: {str(last_error)}")
+
+
+
+
+
+
 
 
 
@@ -438,38 +479,54 @@ if prompt1:
                     
                     
                     
+
+               
                     
                     
-                    # Generate response via OpenRouter with streaming
-                    response_stream = openrouter_client.chat.completions.create(
-                        model=MODEL_NAME,
-                        messages=[
-                            {
-                                "role": "system", 
-                                "content": "Eres un experto asesor en materia de seguridad social e IMSS en México."
-                            },
-                            {
-                                "role": "user",
-                                "content": prompt_template.format(
-                                    context=context,
-                                    question=actual_question
-                                )
-                            }
-                        ],
-                        temperature=0.4,
-                        top_p=0.9,
-                        max_tokens=1500,
-                        stream=True,
-                        extra_headers={
-                            "HTTP-Referer": "http://localhost:8501",
-                            "X-Title": "IMSS Pension Advisor"
+                    
+                    
+
+                    
+                    # Prepare messages payload using prompt_template
+                    messages_payload = [
+                        {
+                            "role": "system", 
+                            "content": "Eres un experto asesor en materia de seguridad social e IMSS en México."
+                        },
+                        {
+                            "role": "user",
+                            "content": prompt_template.format(
+                                context=context,
+                                question=actual_question
+                            )
                         }
+                    ]
+                    
+                    # Generate response via OpenRouter with streaming fallback loop
+                    response_stream, used_model = generate_completion_with_fallback(
+                        openrouter_client,
+                        FREE_MODELS,
+                        messages_payload,
+                        temperature=0.4,
+                        max_tokens=1500
                     )
                     
-                    st.write("📝 Respuesta:")
+                    st.write(f"📝 Respuesta *(Modelo activo: `{used_model}`)*:")
                     st.write_stream(response_stream)
                     
                     st.info(f"⏱️ Tiempo de procesamiento: {time.process_time() - start:.2f} segundos")
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
                     
                     st.write("\n📚 Documentos consultados:")
                     for doc_name, doc_chunks in docs_used.items():
