@@ -77,7 +77,7 @@ streamlit run app3.3_spanish_2.py
 
 ```text
 .
-├── app3.3_spanish_2.py             # Main Streamlit application entry point
+├── app3.3_spanish.py             # Main Streamlit application entry point
 ├── pdf_files_seguridad_social/     # Target directory for official IMSS PDF documents
 ├── ai-advisor-icon.svg             # Application logo & branding asset
 ├── requirements.txt                # Required Python dependencies
