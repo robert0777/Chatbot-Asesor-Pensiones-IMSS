@@ -10,7 +10,7 @@ A Streamlit-based web application designed to query, analyze, and synthesize off
 
 ---
 
-## 📌 Key Features
+## 🌟 Key Features
 
 * **Multi-Document RAG Architecture**: Loads, normalizes, and indexes PDF regulatory documents stored in the local directory (`./pdf_files_seguridad_social`).
 * **High-Availability OpenRouter Model Fallback**: Features automatic sequential model rotation across zero-cost inference endpoints on OpenRouter to protect against `429 Rate Limit Exceeded` errors and service outages:
@@ -73,16 +73,17 @@ streamlit run app3.3_spanish_2.py
 
 ---
 
-## 📁 Directory Structure
+## 📂 Project Structure
 
 ```text
 .
-├── pdf_files_seguridad_social/     # Target directory for official IMSS PDF documents
 ├── app3.3_spanish_2.py             # Main Streamlit application entry point
+├── pdf_files_seguridad_social/     # Target directory for official IMSS PDF documents
 ├── ai-advisor-icon.svg             # Application logo & branding asset
 ├── requirements.txt                # Required Python dependencies
 ├── .env                            # Environment variables configuration
 └── README.md                       # Project documentation
+```
 
 ---
 
