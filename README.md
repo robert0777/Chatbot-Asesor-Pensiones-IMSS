@@ -50,26 +50,16 @@ In your deployed app dashboard on Streamlit Cloud, navigate to **Settings** -> *
 OPENROUTER_API_KEY = "your_openrouter_api_key_here"
 ```
 
-### 3. Install Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configure Environment Variables
-Create a `.env` file in the root directory:
-```env
-OPENROUTER_API_KEY=your_openrouter_api_key_here
-```
-
-### 5. Add Target PDF Documents
+### 3. Add Target PDF Documents
 Place official IMSS regulatory and pension PDF files into:
 ```text
 ./pdf_files_seguridad_social/
 ```
 
-### 6. Launch the Streamlit App
-```bash
-streamlit run app3.3_spanish.py
+### 4. Application Execution Entry
+Point Streamlit Cloud deployment to:
+```text
+app3.3_spanish.py
 ```
 
 ---
