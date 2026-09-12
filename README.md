@@ -12,16 +12,16 @@ A Streamlit-based web application designed to query, analyze, and synthesize off
 
 ## 🌟 Key Features
 
-* **Multi-Document RAG Architecture**: Loads, normalizes, and indexes PDF regulatory documents stored in the local directory (`./pdf_files_seguridad_social`).
+* **Multi-Document RAG Architecture**: Loads, normalizes, and indexes PDF regulatory documents stored in the directory (`./pdf_files_seguridad_social`).
 * **High-Availability OpenRouter Model Fallback**: Features automatic sequential model rotation across zero-cost inference endpoints on OpenRouter to protect against `429 Rate Limit Exceeded` errors and service outages:
   * `minimax/minimax-m3:free`
-  * `nvidia/nemotron-3-ultra-550b-a55b:free`
+  * `google/gemma-4-31b:free`
   * `cohere/north-mini-code:free`
-  * `google/gemma-4-31b-it:free`
-  * `openrouter/free` *(Managed Dynamic Router Fallback)*
+  * `openrouter/free-models-router` *(Managed Dynamic Router Fallback)*
 * **Active Model Tracking & Response Streaming**: Streams completion tokens directly into the UI via `st.write_stream` and displays the exact active endpoint handling execution (`📝 Respuesta (Modelo activo: minimax/minimax-m3:free)`).
 * **Intelligent Document Chunking**: Utilizes LangChain's `RecursiveCharacterTextSplitter` with `tiktoken` encoding to construct optimized context windows and prevent token truncation.
 * **Spanish NLP & Greeting Handler**: Built-in time-aware greeting detection, accent normalization, and rule-based preprocessing for colloquial user inputs.
+* **Streamlit Secrets Native Configuration**: Directly reads credentials from Streamlit Secrets portal (`st.secrets["OPENROUTER_API_KEY"]`), keeping repository deployments secure without requiring `.env` files.
 * **Citation Transparency**: Expands source context blocks showing exact document chunks used to compile each query response.
 
 ---
@@ -31,15 +31,16 @@ A Streamlit-based web application designed to query, analyze, and synthesize off
 * **Frontend / UI**: Streamlit (`>=1.30.0`)
 * **LLM API Client**: Standard OpenAI SDK (`openai>=1.0.0`) via OpenRouter endpoint
 * **Document Processing**: `langchain-community`, `langchain-text-splitters`, `pypdf`
-* **Token Encoding & Utilities**: `tiktoken`, `python-dotenv`
+* **Token Encoding & Utilities**: `tiktoken`
 
 ---
 
-## ⚙️ Installation & Local Setup
+## ⚙️ Deployment & Streamlit Setup
 
-### 1. Clone the Repository
+### 1. Repository Setup
+Push the application repository to GitHub:
 ```bash
-git clone https://github.com/robert0777/chatbot-asesor-pensiones-imss.git
+git clone [https://github.com/robert0777/chatbot-asesor-pensiones-imss.git](https://github.com/robert0777/chatbot-asesor-pensiones-imss.git)
 cd chatbot-asesor-pensiones-imss
 ```
 
@@ -68,7 +69,7 @@ Place official IMSS regulatory and pension PDF files into:
 
 ### 6. Launch the Streamlit App
 ```bash
-streamlit run app3.3_spanish_2.py
+streamlit run app3.3_spanish.py
 ```
 
 ---
@@ -78,10 +79,9 @@ streamlit run app3.3_spanish_2.py
 ```text
 .
 ├── app3.3_spanish.py               # Main Streamlit application entry point
-├── pdf_files_seguridad_social/     # Target directory for official IMSS PDF documents
+├── pdf_files_seguridad_social/     # Directory for official IMSS PDF documents
 ├── ai-advisor-icon.svg             # Application logo & branding asset
 ├── requirements.txt                # Required Python dependencies
-├── .env                            # Environment variables configuration
 └── README.md                       # Project documentation
 ```
 
