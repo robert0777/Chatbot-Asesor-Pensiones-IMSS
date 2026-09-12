@@ -44,10 +44,10 @@ git clone https://github.com/robert0777/chatbot-asesor-pensiones-imss.git
 cd chatbot-asesor-pensiones-imss
 ```
 
-### 2. Create and Activate a Virtual Environment
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+### 2. Streamlit Cloud Secrets Setup
+In your deployed app dashboard on Streamlit Cloud, navigate to **Settings** -> **Secrets**, and store your OpenRouter API key:
+```toml
+OPENROUTER_API_KEY = "your_openrouter_api_key_here"
 ```
 
 ### 3. Install Dependencies
