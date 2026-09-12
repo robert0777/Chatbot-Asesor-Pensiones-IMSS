@@ -1,90 +1,59 @@
 import streamlit as st
 import os
-from openai import OpenAI  # Changed from langchain_nvidia_ai_endpoints
-from langchain_community.document_loaders import PyPDFDirectoryLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter  # Fixed import
-
-# from langchain_core.prompts import ChatPromptTemplate
 import time
-from dotenv import load_dotenv
-import tiktoken
+import datetime
+import re
 from pathlib import Path
 from functools import lru_cache
-import re
-import datetime
+import tiktoken
+from dotenv import load_dotenv
 
+from openai import OpenAI
+from langchain_community.document_loaders import PyPDFDirectoryLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-
-
-# Load environment variables
+# Load environment variables for local testing
 load_dotenv()
+
+DATA_DIR = "./pdf_files_seguridad_social"
 
 class GreetingHandler:
     def __init__(self):
-        # Common Spanish greetings and pleasantries
         self.greetings = {
-            # Basic greetings
             'hola', 'buenos días', 'buenas tardes', 'buenas noches', 'saludos',
-            
-            # Informal greetings
             'qué tal', 'cómo estás', 'como estas', 'qué hace', 'que hace',
-            'qué onda', 'que onda',
-            
-            # Formal greetings
-            'cómo le va', 'cómo está usted', 'como esta usted', 'mucho gusto',
-            
-            # Time-specific greetings
-            'bonito día', 'feliz día', 'buen día',
-            
-            # Common variations
-            'hey', 'hi', 'hello',
-            
-            # Introduction phrases
-            'cómo te llamas', 'me llamo', 'mi nombre es',
-            
-            # Combined greetings
-            'hola, qué tal', 'hola, cómo estás', 'hola, buenos días', 'hola, qué hace',
-            
-            # Regional variations
-            'quiubo', 'qué hubo', 'que hubo', 'qué hay', 'que hay'
+            'qué onda', 'que onda', 'cómo le va', 'cómo está usted', 'como esta usted',
+            'mucho gusto', 'bonito día', 'feliz día', 'buen día', 'hey', 'hi', 'hello',
+            'cómo te llamas', 'me llamo', 'mi nombre es', 'quiubo', 'qué hubo', 'que hubo', 'qué hay'
         }
         
-        # Greeting responses based on time of day
         self.time_based_responses = {
-            'morning': "¡Buenos días! ¿En qué puedo ayudarte con respecto a la seguridad social?",
-            'afternoon': "¡Buenas tardes! ¿En qué puedo ayudarte con respecto a la seguridad social?",
-            'evening': "¡Buenas noches! ¿En qué puedo ayudarte con respecto a la seguridad social?"
+            'morning': "¡Buenos días! ¿En qué puedo ayudarte con respecto a la seguridad social y pensiones del IMSS?",
+            'afternoon': "¡Buenas tardes! ¿En qué puedo ayudarte con respecto a la seguridad social y pensiones del IMSS?",
+            'evening': "¡Buenas noches! ¿En qué puedo ayudarte con respecto a la seguridad social y pensiones del IMSS?"
         }
         
-        # Combined greeting patterns
         self.greeting_pattern = re.compile(
             '|'.join(r'\b{}\b'.format(re.escape(g)) for g in self.greetings),
             re.IGNORECASE
         )
 
     def normalize_text(self, text: str) -> str:
-        """Normalize text by removing accents and converting to lowercase"""
         text = text.lower()
-        replacements = {
-            'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u',
-            'ü': 'u', 'ñ': 'n'
-        }
+        replacements = {'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ü': 'u', 'ñ': 'n'}
         for old, new in replacements.items():
             text = text.replace(old, new)
         return text
 
     def extract_question(self, text: str) -> str:
-        """Remove greeting part from the text and return the actual question"""
         matches = list(self.greeting_pattern.finditer(text))
         if not matches:
             return text
-            
         last_match_end = matches[-1].end()
         question = text[last_match_end:].strip(' ,.!?¿¡')
         return question if question else ""
 
     def process_input(self, user_input: str) -> tuple[bool, str | None, str | None]:
-        """Process user input to handle greetings and questions"""
         if not user_input:
             return False, None, None
             
@@ -113,22 +82,24 @@ def count_tokens(text):
     tokenizer = get_tokenizer()
     return len(tokenizer.encode(text))
 
-def get_pdf_files(directory="./pdf_files_seguridad_social"):
+def get_pdf_files(directory=DATA_DIR):
     pdf_dir = Path(directory)
     pdf_files = sorted(pdf_dir.glob("*.pdf"))
     if not pdf_files:
-        raise FileNotFoundError("No se encontraron archivos PDF en el directorio especificado")
+        raise FileNotFoundError(f"No se encontraron archivos PDF en el directorio: {directory}")
     return pdf_files
 
-
-
+def normalize_spanish_text(text):
+    text = re.sub(r'\s+', ' ', text)
+    text = text.replace('D.', 'Doctor').replace('Dra.', 'Doctora')
+    return text.strip()
 
 def load_documents():
     if "documents" not in st.session_state:
-        pdf_files = get_pdf_files()
+        pdf_files = get_pdf_files(DATA_DIR)
         
-        chunk_size = min(800, max(300, 500 * (50 / len(pdf_files))))  # Fixed this line
-        chunk_overlap = max(50, chunk_size // 10)
+        chunk_size = 1000
+        chunk_overlap = 200
         
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
@@ -136,17 +107,9 @@ def load_documents():
             length_function=count_tokens,
             separators=["\n\n", "\n", ".", "!", "?", "¿", "¡", ";", ":", " ", ""]
         )
-
-
-
-
-
-
-
-        
         
         loader = PyPDFDirectoryLoader(
-            path="./pdf_files_seguridad_social", 
+            path=DATA_DIR, 
             silent_errors=True,
             recursive=False
         )
@@ -160,15 +123,20 @@ def load_documents():
         
         st.session_state.documents = text_splitter.split_documents(processed_docs)
 
+def calculate_chunk_relevance(chunk, question):
+    question_words = set(question.lower().split())
+    chunk_words = set(chunk.page_content.lower().split())
+    
+    word_overlap = len(question_words.intersection(chunk_words))
+    length_factor = 1 / (len(chunk.page_content.split()) + 1)
+    
+    return word_overlap * (1 - length_factor)
+
 def select_relevant_chunks(question, chunks, max_total_tokens=3500):
     prompt_tokens = count_tokens(question) + 500
     available_tokens = max_total_tokens - prompt_tokens
     
-    scored_chunks = []
-    for chunk in chunks:
-        relevance_score = calculate_chunk_relevance(chunk, question)
-        scored_chunks.append((chunk, relevance_score))
-    
+    scored_chunks = [(chunk, calculate_chunk_relevance(chunk, question)) for chunk in chunks]
     scored_chunks.sort(key=lambda x: x[1], reverse=True)
     
     selected_chunks = []
@@ -179,8 +147,7 @@ def select_relevant_chunks(question, chunks, max_total_tokens=3500):
         doc_name = Path(chunk.metadata['source']).name
         chunk_tokens = count_tokens(chunk.page_content)
         
-        if (doc_name not in used_documents and 
-            current_tokens + chunk_tokens <= available_tokens):
+        if doc_name not in used_documents and current_tokens + chunk_tokens <= available_tokens:
             selected_chunks.append(chunk)
             used_documents.add(doc_name)
             current_tokens += chunk_tokens
@@ -208,125 +175,58 @@ def truncate_context(context, max_tokens=6000):
         return '\n'.join(truncated_context)
     return context
 
-def calculate_chunk_relevance(chunk, question):
-    question_words = set(question.lower().split())
-    chunk_words = set(chunk.page_content.lower().split())
-    
-    word_overlap = len(question_words.intersection(chunk_words))
-    length_factor = 1 / (len(chunk.page_content.split()) + 1)
-    
-    return word_overlap * (1 - length_factor)
-
-def normalize_spanish_text(text):
-    text = re.sub(r'\s+', ' ', text)
-    text = text.replace('D.', 'Doctor').replace('Dra.', 'Doctora')
-    return text.strip()
-
-
 # UI Setup
 st.set_page_config(layout="wide", page_title="AI Chatbot Asesor de Pensiones IMSS", page_icon="❓")
 st.image("ai-advisor-icon.svg", width=100)
 st.header("Sistema de Consulta de Documentos de Seguridad Social Mexicana - IMSS")
 st.markdown("Este sistema analiza todos los documentos PDF en el directorio para proporcionar respuestas completas basadas en múltiples fuentes.")
 
-# Create custom CSS for the sidebar
 st.markdown("""
 <style>
-    .sidebar .sidebar-content {
-        background-color: white;
-    }
-    
-    .sidebar-app-name {
-        font-size: 1.2rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        color: #1F2937;
-    }
-    
-    .sidebar-section {
-        padding: 1rem 0;
-        border-bottom: 1px solid #E5E7EB;
-    }
-    
-    .sidebar-link {
-        display: flex;
-        align-items: center;
-        color: #4B5563;
-        text-decoration: none;
-        padding: 0.5rem 0;
-        transition: color 0.2s;
-    }
-    
-    .sidebar-link:hover {
-        color: #2563EB;
-    }
+    .sidebar .sidebar-content { background-color: white; }
+    .sidebar-app-name { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; color: #1F2937; }
+    .sidebar-section { padding: 1rem 0; border-bottom: 1px solid #E5E7EB; }
+    .sidebar-link { display: flex; align-items: center; color: #4B5563; text-decoration: none; padding: 0.5rem 0; transition: color 0.2s; }
+    .sidebar-link:hover { color: #2563EB; }
 </style>
 """, unsafe_allow_html=True)
 
-# Sidebar content
 with st.sidebar:
-    # App Logo and Title
     col1, col2 = st.columns([1, 3])
     with col1:
         st.image("ai-advisor-icon.svg", width=50)
     with col2:
         st.markdown('<p class="sidebar-app-name">AI Chatbot Asesor de Pensiones IMSS</p>', unsafe_allow_html=True)
     
-    
-    # About Section
     st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
     st.markdown("### 📖 About this App")
     st.write("A powerful tool to analyze and query Mexican social security documents using advanced AI technology.")
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Author Section
     st.markdown('<div class="sidebar-section">', unsafe_allow_html=True)
     st.markdown("### 👤 Author")
     st.markdown("**Dr. Robert Hernández Martínez**")
     
-    # Contact Links
     st.markdown("""
-        <a href="https://chomchom216.medium.com/" class="sidebar-link">
-            📝 Articles on Medium
-        </a>
-        <a href="https://unam1.academia.edu/Robert_Hernandez_Martinez" class="sidebar-link">
-            🎓 Academic Publications
-        </a>
-        <a href="https://www.credly.com/users/robert-hernandez.89bffe7b" class="sidebar-link">
-            🏆 Credentials
-
-        </a>
-        <a href="https://github.com/robert0777" class="sidebar-link">
-        🐙 GitHub
-        </a>
-        
-        <a href="mailto:robert@actuariayfinanzas.net" class="sidebar-link">
-            📧 Contact
-        </a>
+        <a href="https://chomchom216.medium.com/" class="sidebar-link">📝 Articles on Medium</a>
+        <a href="https://unam1.academia.edu/Robert_Hernandez_Martinez" class="sidebar-link">🎓 Academic Publications</a>
+        <a href="https://www.credly.com/users/robert-hernandez.89bffe7b" class="sidebar-link">🏆 Credentials</a>
+        <a href="https://github.com/robert0777" class="sidebar-link">🐙 GitHub</a>
+        <a href="mailto:robert@actuariayfinanzas.net" class="sidebar-link">📧 Contact</a>
     """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Footer
     st.markdown("""
         <div style="position: fixed; bottom: 0; padding: 1rem; text-align: center; font-size: 0.8rem; color: #6B7280;">
             © 2026 AI Chatbot Asesor de Pensiones IMSS
         </div>
     """, unsafe_allow_html=True)
 
-
-
-
-
-
-
-
-
-
-# OpenRouter Client Setup
-openrouter_key = os.getenv("OPENROUTER_API_KEY")
+# API Key handling aligned with app_retail 1.0.py (Streamlit secrets + env var fallback)
+openrouter_key = st.secrets.get("OPENROUTER_API_KEY") or os.getenv("OPENROUTER_API_KEY")
 
 if not openrouter_key:
-    st.error("⚠️ OPENROUTER_API_KEY no encontrada en las variables de entorno.")
+    st.error("⚠️ OPENROUTER_API_KEY no encontrada en st.secrets ni en las variables de entorno.")
     st.stop()
 
 try:
@@ -335,30 +235,17 @@ try:
         api_key=openrouter_key
     )
     
-    
-    
-    
-    
-    # Active high-throughput free text generation models on OpenRouter
     FREE_MODELS = [
-        "minimax/minimax-m3:free",                   # Fast, 1M context
-        "nvidia/nemotron-3-ultra-550b-a55b:free",    # Frontier reasoning, 1M context
-        "cohere/north-mini-code:free",                 # Low latency
-        "google/gemma-4-31b-it:free",                 # Multilingual instruction follower
-        "openrouter/free"                            # OpenRouter dynamic router fallback
+        "minimax/minimax-m3:free",
+        "google/gemma-4-31b:free",
+        "cohere/north-mini-code:free",
+        "openrouter/free-models-router"
     ]
-    
-    
-      
 except Exception as e:
     st.error(f"Error al inicializar el cliente de OpenRouter: {str(e)}")
     st.stop()
 
-
 def generate_completion_with_fallback(client, models_list, messages, temperature=0.4, max_tokens=1500):
-    """
-    Attempts to stream chat completion using a list of models sequentially.
-    """
     last_error = None
     for model in models_list:
         try:
@@ -373,55 +260,35 @@ def generate_completion_with_fallback(client, models_list, messages, temperature
                     "X-Title": "IMSS Pension Advisor"
                 }
             )
-            # Return successfully initialized stream and model used
             return response_stream, model
         except Exception as err:
             last_error = err
-            continue # Try next model on failure
+            continue
             
     raise RuntimeError(f"Todos los modelos fallaron. Último error: {str(last_error)}")
 
+IMSS_SYSTEM_PROMPT = "Eres un experto asesor en materia de seguridad social e IMSS en México."
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Prompt template
-prompt_template = """
-Basado en la consulta específica sobre "{question}", analiza cuidadosamente 
-los siguientes extractos de documentos oficiales de seguridad social mexicana 
-para proporcionar una respuesta completa y precisa.
+IMSS_USER_TEMPLATE = """Basado en la consulta específica sobre "{question}", analiza cuidadosamente los siguientes extractos de documentos oficiales de seguridad social mexicana para proporcionar una respuesta completa y precisa.
 
 Instrucciones específicas:
-1. Utiliza información de TODOS los documentos relevantes proporcionados.
-2. Cuando encuentres información complementaria en diferentes documentos, 
-   combínala de manera coherente.
-3. Si hay discrepancias entre documentos, menciónalas.
-4. Cita específicamente de qué documento proviene cada parte de tu respuesta.
-5. Si la información está incompleta, indica qué documentos adicionales podrían ser necesarios.
+1. Responde en español claro y profesional.
+2. Utiliza información de TODOS los documentos relevantes proporcionados.
+3. Cuando encuentres información complementaria en diferentes documentos, combínala de manera coherente.
+4. Si hay discrepancias entre documentos, menciónalas.
+5. Cita específicamente de qué documento proviene cada parte de tu respuesta.
+6. Si la información está incompleta, indica qué documentos adicionales podrían ser necesarios.
 
 Extractos de los documentos:
 {context}
 
 Pregunta: {question}
 
-Respuesta (basada en múltiples documentos):
-"""
+Respuesta (basada en múltiples documentos):"""
 
-# Initialize greeting handler
 if 'greeting_handler' not in st.session_state:
     st.session_state.greeting_handler = GreetingHandler()
 
-# Input and Processing
 prompt1 = st.text_input(
     "Introduzca su consulta:",
     placeholder="Su pregunta será analizada en todos los documentos disponibles"
@@ -437,21 +304,14 @@ if st.button("Click aquí para Cargar y Procesar Documentos en el Sistema"):
         except Exception as e:
             st.error(f"Error al cargar los documentos: {str(e)}")
 
-
-
-
-
-
-
-
-# MODIFIED Query Processing section for NVIDIA NIMS:
+# Refactored input execution flow matching app_retail 1.0.py
 if prompt1:
     is_greeting, greeting_response, actual_question = st.session_state.greeting_handler.process_input(prompt1)
     
-    if is_greeting:
+    if is_greeting and greeting_response:
         st.write(greeting_response)
     
-    if actual_question:
+    if actual_question and actual_question.strip():
         if "documents" in st.session_state:
             try:
                 with st.spinner('Analizando documentos...'):
@@ -472,37 +332,19 @@ if prompt1:
                         doc_section = f"[Documento: {doc_name}]\n{joined_contents}"
                         context_parts.append(doc_section)
                     
-                    context = "\n\n".join(context_parts)
-                    context = truncate_context(context)
-                    
-                   
-                    
-                    
-                    
+                    context = truncate_context("\n\n".join(context_parts))
 
-               
-                    
-                    
-                    
-                    
-
-                    
-                    # Prepare messages payload using prompt_template
                     messages_payload = [
-                        {
-                            "role": "system", 
-                            "content": "Eres un experto asesor en materia de seguridad social e IMSS en México."
-                        },
+                        {"role": "system", "content": IMSS_SYSTEM_PROMPT},
                         {
                             "role": "user",
-                            "content": prompt_template.format(
+                            "content": IMSS_USER_TEMPLATE.format(
                                 context=context,
                                 question=actual_question
                             )
                         }
                     ]
                     
-                    # Generate response via OpenRouter with streaming fallback loop
                     response_stream, used_model = generate_completion_with_fallback(
                         openrouter_client,
                         FREE_MODELS,
@@ -513,20 +355,7 @@ if prompt1:
                     
                     st.write(f"📝 Respuesta *(Modelo activo: `{used_model}`)*:")
                     st.write_stream(response_stream)
-                    
                     st.info(f"⏱️ Tiempo de procesamiento: {time.process_time() - start:.2f} segundos")
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
-                    
                     
                     st.write("\n📚 Documentos consultados:")
                     for doc_name, doc_chunks in docs_used.items():
@@ -537,19 +366,17 @@ if prompt1:
                                 st.markdown("---")
             
             except Exception as e:
-                st.error(f"""Error durante el procesamiento: {str(e)}
-                         Posibles soluciones:
-                         1. Verifique su conexión a internet
-                         2. Confirme la validez de su clave OPENROUTER_API_KEY en el archivo .env
-                         3. Pruebe con una consulta más corta o vuelva a intentar si el modelo gratuito está saturado""")
+                st.error(f"Error durante el procesamiento: {str(e)}")
         else:
-            st.warning("⚠️ Por favor, primero cargue los documentos usando el botón 'Cargar y Procesar Documentos'")
-    elif not is_greeting:
-        st.warning("Por favor, formule una pregunta específica sobre seguridad social.")
-
-
-
-
+            st.warning("⚠️ Por favor, primero cargue los documentos usando el botón 'Click aquí para Cargar y Procesar Documentos en el Sistema'")
+            
+    else:
+        st.info(
+            "💡 **¿En qué te puedo ayudar hoy?** Puedes preguntarme sobre:\n"
+            "- Modalidad 40 y semanas cotizadas en el IMSS.\n"
+            "- Requisitos para pensión bajo Régimen 1973 o 1997.\n"
+            "- Trámites, incapacidades y asignaciones familiares."
+        )
 
 # Footer
 st.markdown("""
