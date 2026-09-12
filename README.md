@@ -40,7 +40,7 @@ A Streamlit-based web application designed to query, analyze, and synthesize off
 ### 1. Repository Setup
 Push the application repository to GitHub:
 ```bash
-git clone [https://github.com/robert0777/chatbot-asesor-pensiones-imss.git](https://github.com/robert0777/chatbot-asesor-pensiones-imss.git)
+git clone https://github.com/robert0777/chatbot-asesor-pensiones-imss.git
 cd chatbot-asesor-pensiones-imss
 ```
 
