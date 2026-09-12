@@ -6,14 +6,10 @@ import re
 from pathlib import Path
 from functools import lru_cache
 import tiktoken
-from dotenv import load_dotenv
 
 from openai import OpenAI
 from langchain_community.document_loaders import PyPDFDirectoryLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-# Load environment variables for local testing
-load_dotenv()
 
 DATA_DIR = "./pdf_files_seguridad_social"
 
@@ -222,11 +218,11 @@ with st.sidebar:
         </div>
     """, unsafe_allow_html=True)
 
-# API Key handling aligned with app_retail 1.0.py (Streamlit secrets + env var fallback)
-openrouter_key = st.secrets.get("OPENROUTER_API_KEY") or os.getenv("OPENROUTER_API_KEY")
+# Direct Streamlit Secrets handling
+openrouter_key = st.secrets.get("OPENROUTER_API_KEY")
 
 if not openrouter_key:
-    st.error("⚠️ OPENROUTER_API_KEY no encontrada en st.secrets ni en las variables de entorno.")
+    st.error("⚠️ OPENROUTER_API_KEY no encontrada en los secretos de Streamlit (st.secrets).")
     st.stop()
 
 try:
@@ -304,7 +300,6 @@ if st.button("Click aquí para Cargar y Procesar Documentos en el Sistema"):
         except Exception as e:
             st.error(f"Error al cargar los documentos: {str(e)}")
 
-# Refactored input execution flow matching app_retail 1.0.py
 if prompt1:
     is_greeting, greeting_response, actual_question = st.session_state.greeting_handler.process_input(prompt1)
     
