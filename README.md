@@ -14,11 +14,14 @@ A Streamlit-based web application designed to query, analyze, and synthesize off
 
 * **Multi-Document RAG Architecture**: Loads, normalizes, and indexes PDF regulatory documents stored in the directory (`./pdf_files_seguridad_social`).
 * **High-Availability OpenRouter Model Fallback**: Features automatic sequential model rotation across zero-cost inference endpoints on OpenRouter to protect against `429 Rate Limit Exceeded` errors and service outages:
-  * `minimax/minimax-m3:free`
   * `google/gemma-4-31b:free`
+  * `google/gemma-4-26b-a4b:free`
+  * `minimax/minimax-m3:free`
+  * `thinking-machines/inkling-small:free`
+  * `nvidia/nemotron-3-nano-omni:free`
   * `cohere/north-mini-code:free`
   * `openrouter/free-models-router` *(Managed Dynamic Router Fallback)*
-* **Active Model Tracking & Response Streaming**: Streams completion tokens directly into the UI via `st.write_stream` and displays the exact active endpoint handling execution (`📝 Respuesta (Modelo activo: minimax/minimax-m3:free)`).
+* **Active Model Tracking & Response Streaming**: Streams completion tokens directly into the UI via `st.write_stream` with a 5,000-token generation ceiling and displays the exact active endpoint handling execution (`📝 Respuesta (Modelo activo: google/gemma-4-31b:free)`).
 * **Intelligent Document Chunking**: Utilizes LangChain's `RecursiveCharacterTextSplitter` with `tiktoken` encoding to construct optimized context windows and prevent token truncation.
 * **Spanish NLP & Greeting Handler**: Built-in time-aware greeting detection, accent normalization, and rule-based preprocessing for colloquial user inputs.
 * **Streamlit Secrets Native Configuration**: Directly reads credentials from Streamlit Secrets portal (`st.secrets["OPENROUTER_API_KEY"]`), keeping repository deployments secure without requiring `.env` files.
